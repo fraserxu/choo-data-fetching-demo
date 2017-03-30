@@ -1,0 +1,26 @@
+{
+  "name": "choo-data-fetching-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "watchify index.js -o bundle.js & pushserve ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fraserxu/choo-data-fetching-demo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fraserxu/choo-data-fetching-demo/issues"
+  },
+  "homepage": "https://github.com/fraserxu/choo-data-fetching-demo#readme",
+  "dependencies": {
+    "choo": "^5.1.0"
+  },
+  "devDependencies": {
+    "pushserve": "^1.0.2",
+    "watchify": "^3.9.0"
+  }
+}

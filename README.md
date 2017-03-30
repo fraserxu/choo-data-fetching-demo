@@ -3,6 +3,8 @@
 ## To start
 
 ```
+$ git clone git@github.com:fraserxu/choo-data-fetching-demo.git
+$ cd choo-data-fetching-demo
 $ npm install
 $ npm start
 ```
@@ -57,8 +59,8 @@ function productStore (state, emitter) {
 
 Set a `loaded` flag.
 * first render will alwasy be 0
-* If switch from page 1 to page 2, `onload` is get callled but **only once**, will get correct value
-* If continue switch page, `onload` in not called anymore
+* If switch from page 1 to page 2, `fetch` is get callled but **only once**, will get correct value
+* If continue switch page, `fetch` in not called anymore
 
 ```js
 var loaded = false
@@ -87,7 +89,7 @@ Trigger fetch in `mainView` function
 * first render will alwasy be 0
 * switch from page to page will get correct value but will also run into infinite render loop
 
-```
+```js
 function mainView (state, emit) {
   emit('fetchProduct')
 

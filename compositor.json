@@ -1,0 +1,95 @@
+{
+  "name": "fraserxu/choo-data-fetching-demo",
+  "version": "0.1.4",
+  "libraries": {
+    "xv": "^1.1.25"
+  },
+  "title": "",
+  "branch": "master",
+  "style": {
+    "name": "Brutalist",
+    "componentSet": {
+      "nav": "nav/BasicNav",
+      "header": "header/BasicHeader",
+      "article": "article/MarkdownArticle",
+      "footer": "footer/BasicFooter"
+    },
+    "fontFamily": "Consolas, \"Liberation Mono\", Menlo, Courier, monospace",
+    "heading": {},
+    "typeScale": [
+      48,
+      32,
+      20,
+      18,
+      16,
+      14,
+      12
+    ],
+    "layout": {
+      "maxWidth": 1024,
+      "fluid": true
+    },
+    "colors": {
+      "text": "#333",
+      "background": "#fff",
+      "primary": "#666",
+      "secondary": "#888",
+      "highlight": "#1f80ff",
+      "muted": "#f6f6f6",
+      "border": "#eee"
+    }
+  },
+  "content": [
+    {
+      "component": "nav",
+      "links": [
+        {
+          "href": "https://github.com/fraserxu/choo-data-fetching-demo",
+          "text": "GitHub"
+        },
+        {
+          "href": "https://npmjs.com/package/choo-data-fetching-demo",
+          "text": "npm"
+        }
+      ]
+    },
+    {
+      "component": "header",
+      "heading": "choo-data-fetching-demo",
+      "subhead": "",
+      "children": [
+        {
+          "component": "ui/TweetButton",
+          "text": "choo-data-fetching-demo: ",
+          "url": null
+        },
+        {
+          "component": "ui/GithubButton",
+          "user": "fraserxu",
+          "repo": "choo-data-fetching-demo"
+        }
+      ],
+      "text": "v1.0.0"
+    },
+    {
+      "component": "article",
+      "metadata": {
+        "source": "github.readme"
+      },
+      "html": "\n<h2>To start</h2>\n<pre><span class=\"hljs-variable\">$ </span>git clone git<span class=\"hljs-variable\">@github</span>.<span class=\"hljs-symbol\">com:</span>fraserxu/choo-data-fetching-demo.git\n<span class=\"hljs-variable\">$ </span>cd choo-data-fetching-demo\n<span class=\"hljs-variable\">$ </span>npm install\n<span class=\"hljs-variable\">$ </span>npm start</pre><p>Go to <code>http://localhost:8000/</code></p>\n<h2>Solution 1</h2>\n<p>Use <code>onload</code> hook</p>\n<ul>\n<li>first render will be <code>state.params.id</code></li>\n<li>data will be fecthed only once</li>\n<li>If switch from page 1 to page 2, <code>onload</code> is not get callled, thus could not fetch data.</li>\n</ul>\n<pre><span class=\"hljs-keyword\">var</span> html = <span class=\"hljs-built_in\">require</span>(<span class=\"hljs-string\">&apos;choo/html&apos;</span>)\n<span class=\"hljs-keyword\">var</span> choo = <span class=\"hljs-built_in\">require</span>(<span class=\"hljs-string\">&apos;choo&apos;</span>)\n\n<span class=\"hljs-keyword\">var</span> app = choo()\napp.use(productStore)\napp.route(<span class=\"hljs-string\">&apos;/:id&apos;</span>, mainView)\napp.mount(<span class=\"hljs-string\">&apos;body&apos;</span>)\n\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> <span class=\"hljs-title\">mainView</span> (<span class=\"hljs-params\">state, emit</span>) </span>{\n  <span class=\"hljs-keyword\">return</span> html<span class=\"hljs-string\">`\n    &lt;body onload=<span class=\"hljs-subst\">${() =&gt; emit(<span class=\"hljs-string\">&apos;fetchProduct&apos;</span>)}</span>&gt;\n      &lt;h1&gt;\n        &lt;a href=&apos;/1&apos;&gt;1&lt;/a&gt;\n        &lt;a href=&apos;/2&apos;&gt;2&lt;/a&gt;\n        &lt;a href=&apos;/3&apos;&gt;3&lt;/a&gt;\n        product is <span class=\"hljs-subst\">${state.product}</span>\n      &lt;/h1&gt;\n    &lt;/body&gt;\n  `</span>\n}\n\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> <span class=\"hljs-title\">productStore</span> (<span class=\"hljs-params\">state, emitter</span>) </span>{\n  state.product = <span class=\"hljs-number\">0</span>\n  emitter.on(<span class=\"hljs-string\">&apos;DOMContentLoaded&apos;</span>, <span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> (<span class=\"hljs-params\"></span>) </span>{\n    emitter.on(<span class=\"hljs-string\">&apos;fetchProduct&apos;</span>, <span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> (<span class=\"hljs-params\"></span>) </span>{\n      setTimeout(<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> (<span class=\"hljs-params\"></span>) </span>{\n        <span class=\"hljs-built_in\">console</span>.log(<span class=\"hljs-string\">&apos;fetch....&apos;</span>)\n        state.product = state.params.id\n        emitter.emit(<span class=\"hljs-string\">&apos;render&apos;</span>)\n      }, <span class=\"hljs-number\">1000</span>)\n    })\n  })\n}</pre><h2>Solution 2</h2>\n<p>Set a <code>loaded</code> flag.</p>\n<ul>\n<li>first render will alwasy be 0</li>\n<li>If switch from page 1 to page 2, <code>fetch</code> is get callled but <strong>only once</strong>, will get correct value</li>\n<li>If continue switch page, <code>fetch</code> in not called anymore</li>\n</ul>\n<pre><span class=\"hljs-keyword\">var</span> loaded = <span class=\"hljs-literal\">false</span>\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> <span class=\"hljs-title\">mainView</span> (<span class=\"hljs-params\">state, emit</span>) </span>{\n  <span class=\"hljs-keyword\">if</span> (!loaded) {\n    loaded = <span class=\"hljs-literal\">true</span>\n    emit(<span class=\"hljs-string\">&apos;fetchProduct&apos;</span>)\n  }\n\n  <span class=\"hljs-keyword\">return</span> html<span class=\"hljs-string\">`\n    &lt;body&gt;\n      &lt;h1&gt;\n        &lt;a href=&apos;/1&apos;&gt;1&lt;/a&gt;\n        &lt;a href=&apos;/2&apos;&gt;2&lt;/a&gt;\n        &lt;a href=&apos;/3&apos;&gt;3&lt;/a&gt;\n        product is <span class=\"hljs-subst\">${state.product}</span>\n      &lt;/h1&gt;\n    &lt;/body&gt;\n  `</span>\n}</pre><h2>Soluction 3</h2>\n<p>Trigger fetch in <code>mainView</code> function</p>\n<ul>\n<li>first render will alwasy be 0</li>\n<li>switch from page to page will get correct value but will also run into infinite render loop</li>\n</ul>\n<pre><span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> <span class=\"hljs-title\">mainView</span> (<span class=\"hljs-params\">state, emit</span>) </span>{\n  emit(<span class=\"hljs-string\">&apos;fetchProduct&apos;</span>)\n\n  <span class=\"hljs-keyword\">return</span> html<span class=\"hljs-string\">`\n    &lt;body&gt;\n      &lt;h1&gt;\n        &lt;a href=&apos;/1&apos;&gt;1&lt;/a&gt;\n        &lt;a href=&apos;/2&apos;&gt;2&lt;/a&gt;\n        &lt;a href=&apos;/3&apos;&gt;3&lt;/a&gt;\n        product is <span class=\"hljs-subst\">${state.product}</span>\n      &lt;/h1&gt;\n    &lt;/body&gt;\n  `</span>\n}</pre>"
+    },
+    {
+      "component": "footer",
+      "links": [
+        {
+          "href": "https://github.com/fraserxu/choo-data-fetching-demo",
+          "text": "GitHub"
+        },
+        {
+          "href": "https://github.com/fraserxu",
+          "text": "fraserxu"
+        }
+      ]
+    }
+  ]
+}
